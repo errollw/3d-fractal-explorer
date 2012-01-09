@@ -2,6 +2,29 @@ package com.erroll.fractal;
 
 public class FractalUtils {
 
+	public static boolean isInMandelBulb(double x, double y, double z) {
+		double MAX_ITERATIONS = 8;
+		double p = 8.0; // order of the bulb
+		double r = Math.sqrt(x * x + y * y + z * z);
+
+		double iter = 0;
+		while (iter < MAX_ITERATIONS && r < 2.0) {
+			double th = Math.atan2(y, x) * p;
+			double ph = Math.asin(z / r) * p;
+			double r2p = Math.pow(r, p);
+			x = r2p * Math.cos(ph) * Math.cos(th) + x;
+			y = r2p * Math.cos(ph) * Math.sin(th) + y;
+			z = r2p * Math.sin(ph) + z;
+			r = Math.sqrt(x * x + y * y + z * z);
+			iter = iter + 1;
+		}
+
+		if (iter == MAX_ITERATIONS)
+			return true;
+		else
+			return false;
+	}
+
 	/**
 	 * Decides if a point at a specific location in a 3D grid with gaps between is filled or not.
 	 * 
@@ -91,5 +114,124 @@ public class FractalUtils {
 			p *= 3;
 		}
 		return true; // Is part of Menger Sponge
+	}
+
+	public static boolean isInMengerSponge3(double x, double y, double z) {
+		double r = x * x + y * y + z * z;
+		double scale = 3;
+		double MI = 15;
+		int i = 0;
+		for (i = 0; i < MI && r < 1000000000; i++) {
+			// rotate1(x,y,z);
+
+			x = Math.abs(x);
+			y = Math.abs(y);
+			z = Math.abs(z);
+			if (x - y < 0) {
+				double x1 = y;
+				y = x;
+				x = x1;
+			}
+			if (x - z < 0) {
+				double x1 = z;
+				z = x;
+				x = x1;
+			}
+			if (y - z < 0) {
+				double y1 = z;
+				z = y;
+				y = y1;
+			}
+
+			// rotate2(x,y,z);
+
+			x = scale * x - 1 * (scale - 1);
+			y = scale * y - 1 * (scale - 1);
+			z = scale * z;
+			if (z > 0.5 * 1 * (scale - 1))
+				z -= 1 * (scale - 1);
+
+			r = x * x + y * y + z * z;
+		}
+		return (i == MI);
+	}
+
+	public static boolean sierpinski3(double x, double y, double z) {
+		double r = x * x + y * y + z * z;
+		double scale = 2;
+		int i = 0;
+		double MI = 100;
+		for (i = 0; i < MI && r < 7; i++) {
+
+			// Folding... These are some of the symmetry planes of the tetrahedron
+			if ((x + y) < 0) {
+				double x1 = -y;
+				y = -x;
+				x = x1;
+			}
+			if ((x + z) < 0) {
+				double x1 = -z;
+				z = -x;
+				x = x1;
+			}
+			if (y + z < 0) {
+				double y1 = -z;
+				z = -y;
+				y = y1;
+			}
+			// if ((x - y) < 0) {
+			// double x1 = y;
+			// y = x;
+			// x = x1;
+			// }
+			// if ((x - z) < 0) {
+			// double x1 = z;
+			// z = x;
+			// x = x1;
+			// }
+
+			// Stretche about the point [1,1,1]*(scale-1)/scale; The "(scale-1)/scale" is here in order to keep the size of the fractal constant wrt scale
+			// double a = 1;
+			// double b = 0;
+			// double c = 0;
+			// Vector3d cS = new Vector3d(a - (c / 3.0), a + b + c, a - (c / 3.0));
+			x = scale * x - 1 * (scale - 1);
+			y = scale * y - 1 * (scale - 1);
+			z = scale * z - 1 * (scale - 1);
+			r = x * x + y * y + z * z;
+		}
+		return (i == MI);// the estimated distance
+	}
+
+	public static boolean tetraSierpinski(double x, double y, double z) {
+		double r = x * x + y * y + z * z;
+		double scale = 2;
+		int i = 0;
+		for (i = 0; i < 10 && r < 5.5; i++) {
+
+			// Folding... These are some of the symmetry planes of the tetrahedron
+			if (x + y < 0) {
+				double x1 = -y;
+				y = -x;
+				x = x1;
+			}
+			if (x + z < 0) {
+				double x1 = -z;
+				z = -x;
+				x = x1;
+			}
+			if (y + z < 0) {
+				double y1 = -z;
+				z = -y;
+				y = y1;
+			}
+
+			// Stretche about the point [1,1,1]*(scale-1)/scale; The "(scale-1)/scale" is here in order to keep the size of the fractal constant wrt scale
+			x = scale * x - (scale - 1);// equivalent to: x=scale*(x-cx); where cx=(scale-1)/scale;
+			y = scale * y - (scale - 1);
+			z = scale * z - (scale - 1);
+			r = x * x + y * y + z * z;
+		}
+		return (i == 10);// the estimated distance
 	}
 }

@@ -4,7 +4,7 @@ import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
 
-import com.erroll.Axis;
+import com.erroll.math.Axis;
 
 public class Camera implements CameraInterface {
 
@@ -23,6 +23,23 @@ public class Camera implements CameraInterface {
 	// from camera's point of view, the viewplane is defined by these vectors
 	private Vector3d viewplaneTop;
 	private Vector3d viewplaneLeft;
+
+	/**
+	 * Creates a new Camera object that is a copy of the camera object passed to it.
+	 * 
+	 * @param cameraToCopy
+	 *            The camera object to be copied.
+	 */
+	public Camera(CameraInterface cameraToCopy) {
+		// construct fields from copied CameraInterface object
+		position = new Vector3d(cameraToCopy.getPosition());
+		lookPoint = new Vector3d(cameraToCopy.getLookPoint());
+		lookVector = new Vector3d(cameraToCopy.getLookVector());
+		upVector = new Vector3d(cameraToCopy.getUpVector());
+		distanceToViewplane = cameraToCopy.getDistanceToViewplane();
+		viewplaneTop = new Vector3d(cameraToCopy.getViewplaneTop());
+		viewplaneLeft = new Vector3d(cameraToCopy.getViewplaneLeft());
+	}
 
 	/**
 	 * Creates a new Camera object pointing at the origin, 5 units away from it. Up vector is along y axis.
@@ -244,13 +261,32 @@ public class Camera implements CameraInterface {
 		return distanceToViewplane;
 	}
 
+	public void setDistanceToViewplane(double distanceToViewplaneParam) {
+		distanceToViewplane = distanceToViewplaneParam;
+	}
+
 	@Override
 	public Vector3d getViewplaneTop() {
 		return viewplaneTop;
 	}
 
 	@Override
+	public void setViewplaneTopLength(double viewplaneHeight) {
+		// viewplaneLeft = -upVector * viewplaneHeight
+		viewplaneLeft.scale(viewplaneHeight, upVector);
+		viewplaneLeft.negate();
+	}
+
+	@Override
 	public Vector3d getViewplaneLeft() {
 		return viewplaneLeft;
+	}
+
+	@Override
+	public void setViewplaneLeftLength(double viewplaneWidth) {
+		// viewplaneTop = upVector X lookVector * viewplaneWidth
+		viewplaneTop.cross(upVector, lookVector);
+		viewplaneTop.negate();
+		viewplaneTop.scale(viewplaneWidth);
 	}
 }

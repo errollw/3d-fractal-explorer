@@ -16,7 +16,7 @@ public class OctreeNodeTest {
 	@Before
 	public void setUp() throws Exception {
 		// initialize octreeNode with default field values
-		octreeNode = new OctreeNode(false, true, null, Color.BLUE);
+		octreeNode = new OctreeNode(false, true, null, null, Color.BLUE.getRGB(), 0);
 	}
 
 	@Test
@@ -64,13 +64,13 @@ public class OctreeNodeTest {
 	@Test
 	public void testGetColor() {
 		// test default octree values (Color.BLUE)
-		assertTrue(octreeNode.getColor().equals(Color.BLUE));
+		assertTrue(octreeNode.getColor() == Color.BLUE.getRGB());
 	}
 
 	@Test
 	public void testSetColorColor() {
 		// set color to Color.RED and test for change
-		octreeNode.setColor(Color.RED);
-		assertTrue(octreeNode.getColor().equals(Color.RED));
+		octreeNode.setColor(Color.RED.getRGB());
+		assertTrue(octreeNode.getColor() == Color.RED.getRGB());
 	}
 }

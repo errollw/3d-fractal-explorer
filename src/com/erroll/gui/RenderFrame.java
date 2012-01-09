@@ -1,94 +1,139 @@
 package com.erroll.gui;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
-import javax.vecmath.Vector3d;
 
+import com.erroll.camera.Camera;
 import com.erroll.camera.CameraInterface;
+import com.erroll.metrics.Metrics;
+import com.erroll.renderer.RayCasterBeamOptNeighbor;
+import com.erroll.renderer.RayCasterBeamOptRestart;
+import com.erroll.renderer.RayCasterInterface;
+import com.erroll.renderer.RayCasterNeighbor;
+import com.erroll.renderer.RayCasterRestart;
+import com.erroll.renderer.RayCasterRestartScaleAdaptation;
 
 public class RenderFrame extends JFrame {
 
-	private static final long serialVersionUID = 1554826591877804614L;
+	// generated serialVersionUID
+	private static final long serialVersionUID = -2587976746868524926L;
 
-	// singleton stuff (thread-safe)
-	private static class SingletonHolder {
-		public static final RenderFrame instance = new RenderFrame();
+	// Properties to be used by each class
+	private Properties props;
+
+	// rendering objects to draw the fractal
+	private static CameraInterface camera;
+	private static RayCasterInterface rayCaster;
+
+	// metrics object to record data about the rendering
+	private static Metrics metrics;
+
+	// name to display on top of the frame
+	private String displayName = "";
+
+	public RenderFrame() {
+		// load properties
+		props = loadProperties();
+		int size = Integer.parseInt(props.getProperty("SIZE"));
+
+		// create metrics object
+		metrics = new Metrics();
+
+		// set basic JFrame properties
+		setPreferredSize(new Dimension(size, size));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setVisible(true);
+		setResizable(false);
+		pack();
+
+		// create buffer strategy to double buffer renderer
+		createBufferStrategy(2);
+
+		// create camera;
+		camera = new Camera();
+		//camera.setDistanceToViewplane(10);
+
+		// create and initialize rayCaster
+		if (props.getProperty("NEIGHBOR").equals("1")) {
+			if (props.getProperty("BEAMOPT").equals("1")) {
+				displayName = "Neighbor & BeamOpt";
+				rayCaster = new RayCasterBeamOptNeighbor();
+			} else {
+				displayName = "Neighbor";
+				rayCaster = new RayCasterNeighbor();
+			}
+		} else if (props.getProperty("BEAMOPT").equals("1")) {
+			displayName = "Restart & BeamOpt";
+			rayCaster = new RayCasterBeamOptRestart();
+		} else {
+			displayName = "Restart";
+			rayCaster = new RayCasterRestart();
+		}
+		rayCaster = new RayCasterRestartScaleAdaptation();
+
+		rayCaster.initialise(props, camera, size, size);
+		rayCaster.setMetrics(metrics);
+		rayCaster.setDebug(props.getProperty("DEBUG").equals("1") ? true : false);
+
+		// add listener to handle keyboard controls
+		addKeyListener(new KeyboardControlListener(camera));
 	}
 
-	public static RenderFrame getInstance() {
-		return SingletonHolder.instance;
+	// load properties from file "parameters.properties" into props object to be passed on during initializations
+	private Properties loadProperties() {
+		Properties p = new Properties();
+		try {
+			p.load(new BufferedReader(new FileReader("parameters.properties")));
+		} catch (FileNotFoundException e1) {
+			System.out.println("FILE NOT FOUND");
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return p;
 	}
 
-	private RenderFrame() {
-	};
+	/**
+	 * Update title of JFrame with metrics data
+	 */
+	public void updateTitle() {
+		setTitle(displayName + " | Current FPS: " + metrics.getFps());
+	}
 
 	public static void main(String[] args) {
 
-		final RenderFrame frame = RenderFrame.getInstance();
-		final RenderPanel panel = new RenderPanel();
+		// frame to be rendered into
+		final RenderFrame renderFrame = new RenderFrame();
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(panel);
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-
-		frame.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				CameraInterface c = panel.getRaycaster().getCamera();
-
-				// ARROW KEYS [rotate camera around origin]
-				if (e.getExtendedKeyCode() == 37)
-					c.rotateAroundOrigin(c.getViewplaneLeft(), -0.05d);
-				else if (e.getExtendedKeyCode() == 38)
-					c.rotateAroundOrigin(c.getViewplaneTop(), +0.05d);
-				else if (e.getExtendedKeyCode() == 39)
-					c.rotateAroundOrigin(c.getViewplaneLeft(), +0.05d);
-				else if (e.getExtendedKeyCode() == 40)
-					c.rotateAroundOrigin(c.getViewplaneTop(), -0.05d);
-
-				// WASD [move camera in 3D space]
-				if (e.getExtendedKeyCode() == 87) {
-					Vector3d offset = new Vector3d(c.getLookVector());
-					offset.scale(0.1d);
-					c.moveCameraBy(offset);
-				} else if (e.getExtendedKeyCode() == 65) {
-					Vector3d offset = new Vector3d(c.getViewplaneTop());
-					offset.scale(-0.02d);
-					c.moveCameraBy(offset);
-				} else if (e.getExtendedKeyCode() == 83) {
-					Vector3d offset = new Vector3d(c.getLookVector());
-					offset.scale(-0.1d);
-					c.moveCameraBy(offset);
-				} else if (e.getExtendedKeyCode() == 68) {
-					Vector3d offset = new Vector3d(c.getViewplaneTop());
-					offset.scale(0.02d);
-					c.moveCameraBy(offset);
-				}
-
-				// IJKL [rotate lookvector]
-				if (e.getExtendedKeyCode() == 73)
-					c.rotate(c.getViewplaneTop(), +0.01d);
-				else if (e.getExtendedKeyCode() == 74)
-					c.rotate(c.getViewplaneLeft(), -0.01d);
-				else if (e.getExtendedKeyCode() == 75)
-					c.rotate(c.getViewplaneTop(), -0.01d);
-				else if (e.getExtendedKeyCode() == 76)
-					c.rotate(c.getViewplaneLeft(), +0.01d);
-
+		// set up timer to update title of frame with metrics
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				renderFrame.updateTitle();
 			}
+		}, 1000, 1000);
 
-			@Override
-			public void keyReleased(KeyEvent e) {
+		// loop to draw graphics to screen using BufferStrategy with 2 buffers
+		while (true) {
+			Graphics g = null;
+			try {
+				g = renderFrame.getBufferStrategy().getDrawGraphics();
+				rayCaster.render(g);
+			} finally {
+				if (g != null)
+					g.dispose();
 			}
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-		});
+			renderFrame.getBufferStrategy().show();
+		}
 	}
 }

@@ -2,7 +2,7 @@ package com.erroll.camera;
 
 import javax.vecmath.Vector3d;
 
-import com.erroll.Axis;
+import com.erroll.math.Axis;
 
 public interface CameraInterface {
 
@@ -157,6 +157,11 @@ public interface CameraInterface {
 	 * @return The distance from the camera's position to its viewplane
 	 */
 	double getDistanceToViewplane();
+	
+	/**
+	 * This modifies how far the camera is from the viewplane; changes the field-of-view
+	 */
+	void setDistanceToViewplane(double distanceToViewplaneParam);
 
 	/**
 	 * @return The vector describing the top of the viewplane (from top left)
@@ -164,7 +169,17 @@ public interface CameraInterface {
 	Vector3d getViewplaneTop();
 
 	/**
+	 * sets the length of the top side of the viewplane
+	 */
+	void setViewplaneTopLength(double viewplaneHeight);
+
+	/**
 	 * @return The vector describing the side of the viewplane (from top left)
 	 */
 	Vector3d getViewplaneLeft();
+
+	/**
+	 * sets the length of the left side of the viewplane
+	 */
+	void setViewplaneLeftLength(double viewplaneWidth);
 }

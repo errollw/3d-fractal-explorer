@@ -7,8 +7,8 @@ import javax.vecmath.Vector3d;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.erroll.Axis;
 import com.erroll.TestUtils;
+import com.erroll.math.Axis;
 
 public class CameraTest {
 

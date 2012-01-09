@@ -2,7 +2,37 @@ package com.erroll.renderer;
 
 import javax.vecmath.Vector3d;
 
+@Deprecated
 public class RayCastUtils {
+
+	private Vector3d pVec;
+	private Vector3d cPos;
+
+	private double tx0;
+	private double tx1;
+	private double ty0;
+	private double ty1;
+	private double tz0;
+	private double tz1;
+	private double temp;
+
+	private double tmin;
+	private double tmax;
+
+	public boolean enclosing(Vector3d p, Vector3d boxMin, double boxDim) {
+		
+		if(p.x < boxMin.x) return false;
+		if(p.x >= (boxMin.x + boxDim)) return false;
+		if(p.y < boxMin.y) return false;
+		if(p.y >= (boxMin.y + boxDim)) return false;
+		if(p.z < boxMin.z) return false;
+		if(p.z >= (boxMin.z + boxDim)) return false;
+		
+		return true;
+		
+		//return (p.x > boxMin.x) && (p.y > boxMin.y) && (p.z > boxMin.z) && (p.x < (boxMin.x + boxDim)) && (p.y < (boxMin.y + boxDim))
+		//		&& (p.z < (boxMin.z + boxDim));
+	}
 
 	/**
 	 * Helper function to return a vector of either 1s or 0s depending on whether each component of a is greater than or equal to b's relative component
@@ -13,9 +43,8 @@ public class RayCastUtils {
 	 *            The potentially smaller vector
 	 * @return (1 if a.x > b.x or 0 otherwise, similar, similar)
 	 */
-	static Vector3d step(Vector3d a, Vector3d b) {
-		Vector3d result = new Vector3d((a.x >= b.x) ? 1 : 0, (a.y >= b.y) ? 1 : 0, (a.z >= b.z) ? 1 : 0);
-		return result;
+	public Vector3d step(Vector3d a, Vector3d b) {
+		return new Vector3d((a.x >= b.x) ? 1 : 0, (a.y >= b.y) ? 1 : 0, (a.z >= b.z) ? 1 : 0);
 	}
 
 	/**
@@ -29,29 +58,29 @@ public class RayCastUtils {
 	 *            The dimensions of the box extending from this start position to (a.x + dim, a.y + dim, a.z + dim)
 	 * @return true if the ray passes through the box starting at position a with sides of length dim, false otherwise
 	 */
-	static boolean boxClip(RayInterface ray, Vector3d a, double dim) {
-		Vector3d pVec = ray.getDir();
-		Vector3d cPos = ray.getStart();
+	public boolean boxClip(RayInterface ray, Vector3d a, double dim) {
+		pVec = ray.getDir();
+		cPos = ray.getStart();
 
-		double tx0 = (a.x - cPos.x) / pVec.x;
-		double tx1 = ((a.x + dim) - cPos.x) / pVec.x;
-		double ty0 = (a.y - cPos.y) / pVec.y;
-		double ty1 = ((a.y + dim) - cPos.y) / pVec.y;
-		double tz0 = (a.z - cPos.z) / pVec.z;
-		double tz1 = ((a.z + dim) - cPos.z) / pVec.z;
+		tx0 = (a.x - cPos.x) / pVec.x;
+		tx1 = ((a.x + dim) - cPos.x) / pVec.x;
+		ty0 = (a.y - cPos.y) / pVec.y;
+		ty1 = ((a.y + dim) - cPos.y) / pVec.y;
+		tz0 = (a.z - cPos.z) / pVec.z;
+		tz1 = ((a.z + dim) - cPos.z) / pVec.z;
 
 		if (tx1 < tx0) {
-			double temp = tx0;
+			temp = tx0;
 			tx0 = tx1;
 			tx1 = temp;
 		}
 		if (ty1 < ty0) {
-			double temp = ty0;
+			temp = ty0;
 			ty0 = ty1;
 			ty1 = temp;
 		}
 		if (tz1 < tz0) {
-			double temp = tz0;
+			temp = tz0;
 			tz0 = tz1;
 			tz1 = temp;
 		}
@@ -76,18 +105,18 @@ public class RayCastUtils {
 	 *            The dimensions of the box extending from this start position to (a.x + dim, a.y + dim, a.z + dim)
 	 * @return the minimum t parameter
 	 */
-	static double boxClip_tmin(RayInterface ray, Vector3d a, double dim) {
-		Vector3d pVec = ray.getDir();
-		Vector3d cPos = ray.getStart();
+	public double boxClip_tmin(RayInterface ray, Vector3d a, double dim) {
+		pVec = ray.getDir();
+		cPos = ray.getStart();
 
-		double tx0 = (a.x - cPos.x) / pVec.x;
-		double tx1 = ((a.x + dim) - cPos.x) / pVec.x;
-		double ty0 = (a.y - cPos.y) / pVec.y;
-		double ty1 = ((a.y + dim) - cPos.y) / pVec.y;
-		double tz0 = (a.z - cPos.z) / pVec.z;
-		double tz1 = ((a.z + dim) - cPos.z) / pVec.z;
+		tx0 = (a.x - cPos.x) / pVec.x;
+		tx1 = ((a.x + dim) - cPos.x) / pVec.x;
+		ty0 = (a.y - cPos.y) / pVec.y;
+		ty1 = ((a.y + dim) - cPos.y) / pVec.y;
+		tz0 = (a.z - cPos.z) / pVec.z;
+		tz1 = ((a.z + dim) - cPos.z) / pVec.z;
 
-		double tmin = Math.max(Math.min(tx0, tx1), Math.max(Math.min(ty0, ty1), Math.min(tz0, tz1)));
+		tmin = Math.max(Math.min(tx0, tx1), Math.max(Math.min(ty0, ty1), Math.min(tz0, tz1)));
 		return tmin;
 	}
 
@@ -102,34 +131,34 @@ public class RayCastUtils {
 	 *            The dimensions of the box extending from this start position to (a.x + dim, a.y + dim, a.z + dim)
 	 * @return the maximum t parameter
 	 */
-	static double boxClip_tmax(RayInterface ray, Vector3d a, double dim) {
-		Vector3d pVec = ray.getDir();
-		Vector3d cPos = ray.getStart();
+	public double boxClip_tmax(RayInterface ray, Vector3d a, double dim) {
+		pVec = ray.getDir();
+		cPos = ray.getStart();
 
-		double tx0 = (a.x - cPos.x) / pVec.x;
-		double tx1 = ((a.x + dim) - cPos.x) / pVec.x;
-		double ty0 = (a.y - cPos.y) / pVec.y;
-		double ty1 = ((a.y + dim) - cPos.y) / pVec.y;
-		double tz0 = (a.z - cPos.z) / pVec.z;
-		double tz1 = ((a.z + dim) - cPos.z) / pVec.z;
+		tx0 = (a.x - cPos.x) / pVec.x;
+		tx1 = ((a.x + dim) - cPos.x) / pVec.x;
+		ty0 = (a.y - cPos.y) / pVec.y;
+		ty1 = ((a.y + dim) - cPos.y) / pVec.y;
+		tz0 = (a.z - cPos.z) / pVec.z;
+		tz1 = ((a.z + dim) - cPos.z) / pVec.z;
 
 		if (tx1 < tx0) {
-			double temp = tx0;
+			temp = tx0;
 			tx0 = tx1;
 			tx1 = temp;
 		}
 		if (ty1 < ty0) {
-			double temp = ty0;
+			temp = ty0;
 			ty0 = ty1;
 			ty1 = temp;
 		}
 		if (tz1 < tz0) {
-			double temp = tz0;
+			temp = tz0;
 			tz0 = tz1;
 			tz1 = temp;
 		}
 
-		double tmax = Math.min(tx1, Math.min(ty1, tz1));
+		tmax = Math.min(tx1, Math.min(ty1, tz1));
 		return tmax;
 	}
 
@@ -144,34 +173,34 @@ public class RayCastUtils {
 	 *            The dimensions of the box extending from this start position to (a.x + dim, a.y + dim, a.z + dim)
 	 * @return A vector (x,y,z) with y = 1 if the neighbor is above, -1 if it is below and 0 if it will have the same y coordinate. Similar for other axes.
 	 */
-	static Vector3d findNeighbour(RayInterface ray, Vector3d a, double dim) {
-		Vector3d pVec = ray.getDir();
-		Vector3d cPos = ray.getStart();
+	public Vector3d findNeighbour(RayInterface ray, Vector3d a, double dim) {
+		pVec = ray.getDir();
+		cPos = ray.getStart();
 
-		double tx0 = (a.x - cPos.x) / pVec.x;
-		double tx1 = ((a.x + dim) - cPos.x) / pVec.x;
-		double ty0 = (a.y - cPos.y) / pVec.y;
-		double ty1 = ((a.y + dim) - cPos.y) / pVec.y;
-		double tz0 = (a.z - cPos.z) / pVec.z;
-		double tz1 = ((a.z + dim) - cPos.z) / pVec.z;
+		tx0 = (a.x - cPos.x) / pVec.x;
+		tx1 = ((a.x + dim) - cPos.x) / pVec.x;
+		ty0 = (a.y - cPos.y) / pVec.y;
+		ty1 = ((a.y + dim) - cPos.y) / pVec.y;
+		tz0 = (a.z - cPos.z) / pVec.z;
+		tz1 = ((a.z + dim) - cPos.z) / pVec.z;
 
 		if (tx1 < tx0) {
-			double temp = tx0;
+			temp = tx0;
 			tx0 = tx1;
 			tx1 = temp;
 		}
 		if (ty1 < ty0) {
-			double temp = ty0;
+			temp = ty0;
 			ty0 = ty1;
 			ty1 = temp;
 		}
 		if (tz1 < tz0) {
-			double temp = tz0;
+			temp = tz0;
 			tz0 = tz1;
 			tz1 = temp;
 		}
 
-		double tmax = Math.min(tx1, Math.min(ty1, tz1));
+		tmax = Math.min(tx1, Math.min(ty1, tz1));
 
 		if (tmax == tx1)
 			return new Vector3d(ray.getDir().x / Math.abs(ray.getDir().x), 0, 0);
