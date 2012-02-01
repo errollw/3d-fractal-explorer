@@ -12,7 +12,7 @@ import com.erroll.math.Axis;
 
 public class CameraTest {
 
-	//the object to be tested on
+	// the object to be tested on
 	private Camera camera;
 
 	// prepare starting parameters to test with
@@ -31,6 +31,19 @@ public class CameraTest {
 		// make testing camera object
 		camera = new Camera();
 		camera.initialise(startPosition, startLookPoint, startDistanceToViewplane, startViewplaneWidth, startViewplaneHeight);
+	}
+
+	@Test
+	public void testCameraCameraInterface() {
+		// copy the camera and test all properties are the same
+		Camera cameraNew = new Camera(camera);
+		assertTrue(cameraNew.getDistanceToViewplane() == camera.getDistanceToViewplane());
+		assertTrue(cameraNew.getLookPoint().epsilonEquals(camera.getLookPoint(), TestUtils.EPSILON));
+		assertTrue(cameraNew.getLookVector().epsilonEquals(camera.getLookVector(), TestUtils.EPSILON));
+		assertTrue(cameraNew.getPosition().epsilonEquals(camera.getPosition(), TestUtils.EPSILON));
+		assertTrue(cameraNew.getUpVector().epsilonEquals(camera.getUpVector(), TestUtils.EPSILON));
+		assertTrue(cameraNew.getViewplaneLeft().epsilonEquals(camera.getViewplaneLeft(), TestUtils.EPSILON));
+		assertTrue(cameraNew.getViewplaneTop().epsilonEquals(camera.getViewplaneTop(), TestUtils.EPSILON));
 	}
 
 	@Test
@@ -308,29 +321,6 @@ public class CameraTest {
 	}
 
 	@Test
-	public void testGetPositionOfPixel() {
-
-		// check position of pixel in top left of screen for default values (resolution not important)
-		assertTrue("expected pixel position for top left (0): (-1.5,1.5,2)",
-				camera.getPositionOfPixel(0d, 0d, 999d, 111d).epsilonEquals(new Vector3d(-1.5d, 1.5d, 2d), TestUtils.EPSILON));
-		assertTrue("expected pixel position for top left (1): (-1.5,1.5,2)",
-				camera.getPositionOfPixel(0d, 0d, 111d, 999d).epsilonEquals(new Vector3d(-1.5d, 1.5d, 2d), TestUtils.EPSILON));
-
-		// check position of pixel in center of screen for default values
-		assertTrue("expected pixel position for center: (0,0,2)",
-				camera.getPositionOfPixel(1, 1, 2, 2).epsilonEquals(new Vector3d(0d, 0d, 2d), TestUtils.EPSILON));
-
-		// check position of pixel in bottom right screen for default values (set pixel number to resolution max)
-		assertTrue("expected pixel position for bottom right: (1.5,-1.5,2)",
-				camera.getPositionOfPixel(123d, 456d, 123d, 456d).epsilonEquals(new Vector3d(1.5d, -1.5d, 2d), TestUtils.EPSILON));
-
-		// move camera by offset (1,1,1) and check position in center of screen has changed accordingly
-		camera.moveCameraBy(new Vector3d(1d, 1d, 1d));
-		assertTrue("expected pixel position for center after move: (1,1,3)",
-				camera.getPositionOfPixel(1, 2, 2, 4).epsilonEquals(new Vector3d(1d, 1d, 3d), TestUtils.EPSILON));
-	}
-
-	@Test
 	public void testGetPosition() {
 		// assert getting the default camera position
 		assertTrue("incorrect position for default values: ", camera.getPosition().epsilonEquals(startPosition, TestUtils.EPSILON));
@@ -377,4 +367,39 @@ public class CameraTest {
 				camera.getViewplaneLeft().epsilonEquals(new Vector3d(0d, -3d, 0d), TestUtils.EPSILON));
 	}
 
+	@Test
+	public void testSetViewplaneLeftLengthDouble() {
+		// assert getting the default viewplaneLeft, should be 2
+		assertTrue("incorrect viewplaneLeft for default values: " + camera.getViewplaneLeft(),
+				camera.getViewplaneLeft().epsilonEquals(new Vector3d(0d, -3d, 0d), TestUtils.EPSILON));
+		// modify viewplane height
+		camera.setViewplaneLeftLength(16d);
+		// assert getting the new viewplaneLeft
+		assertTrue("incorrect new viewplaneLeft: " + camera.getViewplaneLeft(),
+				camera.getViewplaneLeft().epsilonEquals(new Vector3d(0d, -16d, 0d), TestUtils.EPSILON));
+	}
+
+	@Test
+	public void testSetViewplaneTopLengthDouble() {
+		// assert getting the default viewplaneTop
+		assertTrue("incorrect viewplaneTop for default values: " + camera.getViewplaneTop(),
+				camera.getViewplaneTop().epsilonEquals(new Vector3d(3d, 0d, 0d), TestUtils.EPSILON));
+		// modify viewplane width
+		camera.setViewplaneTopLength(1d);
+		// assert getting the default viewplaneTop
+		assertTrue("incorrect new viewplaneTop: " + camera.getViewplaneTop(),
+				camera.getViewplaneTop().epsilonEquals(new Vector3d(1d, 0d, 0d), TestUtils.EPSILON));
+	}
+
+	@Test
+	public void testSetDistanceToViewplaneDouble() {
+		// assert getting the distance to the viewplane works for default distance
+		assertTrue("incorrect distanceToViewplane for default values: " + camera.getDistanceToViewplane(),
+				TestUtils.equals(camera.getDistanceToViewplane(), startDistanceToViewplane));
+		// modify distance from camera to viewplane
+		camera.setDistanceToViewplane(99d);
+		// assert getting the distance to the viewplane works for default distance
+		assertTrue("incorrect new distanceToViewplane: " + camera.getDistanceToViewplane(), TestUtils.equals(camera.getDistanceToViewplane(), 99d));
+
+	}
 }

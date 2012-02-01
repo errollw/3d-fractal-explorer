@@ -36,30 +36,8 @@ public class RayTest {
 	}
 
 	@Test
-	public void testSetDir() {
-		// prepare new vector to test normalization of direction
-		Vector3d newDir = new Vector3d(1d, 2d, 3d);
-		Vector3d newDirNorm = new Vector3d(newDir);
-		newDirNorm.normalize();
-
-		// change direction vector of ray and check it has been normalized
-		ray.setDir(newDir);
-		assertTrue(ray.getDir().epsilonEquals(newDirNorm, TestUtils.EPSILON));
-		assertTrue(TestUtils.equals(ray.getDir().length(), 1d));
-
-	}
-
-	@Test
 	public void testGetStart() {
 		// test getter for default values
 		assertTrue(ray.getStart().epsilonEquals(startStart, TestUtils.EPSILON));
 	}
-
-	@Test
-	public void testSetStart() {
-		// change starting position of ray and check it has been correctly changed
-		ray.setStart(new Vector3d(-1d, -2d, -3d));
-		assertTrue(ray.getStart().epsilonEquals(new Vector3d(-1d, -2d, -3d), TestUtils.EPSILON));
-	}
-
 }

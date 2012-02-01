@@ -25,20 +25,21 @@ public class Camera implements CameraInterface {
 	private Vector3d viewplaneLeft;
 
 	/**
-	 * Creates a new Camera object that is a copy of the camera object passed to it.
+	 * Creates a new Camera object that is a copy of the camera object passed to it. This is used when double buffering to keep the camera being used by the
+	 * renderer steady even though the scene camera may have been moved during the time taken to render a frame
 	 * 
 	 * @param cameraToCopy
 	 *            The camera object to be copied.
 	 */
 	public Camera(CameraInterface cameraToCopy) {
 		// construct fields from copied CameraInterface object
-		position = new Vector3d(cameraToCopy.getPosition());
-		lookPoint = new Vector3d(cameraToCopy.getLookPoint());
-		lookVector = new Vector3d(cameraToCopy.getLookVector());
-		upVector = new Vector3d(cameraToCopy.getUpVector());
+		position = cameraToCopy.getPosition();
+		lookPoint = cameraToCopy.getLookPoint();
+		lookVector = cameraToCopy.getLookVector();
+		upVector = cameraToCopy.getUpVector();
 		distanceToViewplane = cameraToCopy.getDistanceToViewplane();
-		viewplaneTop = new Vector3d(cameraToCopy.getViewplaneTop());
-		viewplaneLeft = new Vector3d(cameraToCopy.getViewplaneLeft());
+		viewplaneTop = cameraToCopy.getViewplaneTop();
+		viewplaneLeft = cameraToCopy.getViewplaneLeft();
 	}
 
 	/**
@@ -80,18 +81,6 @@ public class Camera implements CameraInterface {
 		viewplaneTop.cross(upVector, lookVector);
 		viewplaneTop.negate();
 		viewplaneTop.scale(viewplaneWidth);
-	}
-
-	@Override
-	public void printInfo() {
-		// prints position, lookPoint, lookVector, upVector, viewplaneTop, viewplaneLeft
-		System.out.printf("position:\t(%.2f, %.2f, %.2f)" + "\t" + "lookPoint:\t(%.2f, %.2f, %.2f)\n", position.x, position.y, position.z, lookPoint.x,
-				lookPoint.y, lookPoint.z);
-		System.out.printf("lookVector:\t(%.2f, %.2f, %.2f)" + "\t" + "upVector:\t(%.2f, %.2f, %.2f)\n", lookVector.x, lookVector.y, lookVector.z, upVector.x,
-				upVector.y, upVector.z);
-		System.out.printf("viewplaneTop:\t(%.2f, %.2f, %.2f)" + "\t" + "viewplaneLeft:\t(%.2f, %.2f, %.2f)\n", viewplaneTop.x, viewplaneTop.y, viewplaneTop.z,
-				viewplaneLeft.x, viewplaneLeft.y, viewplaneLeft.z);
-		System.out.println();
 	}
 
 	@Override
@@ -206,8 +195,7 @@ public class Camera implements CameraInterface {
 		return vectorToPixel;
 	}
 
-	@Override
-	public Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY) {
+	private Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY) {
 
 		// set the return value to the top left of the viewplane on origin
 		Vector3d pixelPosition = new Vector3d();
@@ -238,22 +226,22 @@ public class Camera implements CameraInterface {
 
 	@Override
 	public Vector3d getPosition() {
-		return position;
+		return new Vector3d(position);
 	}
 
 	@Override
 	public Vector3d getLookPoint() {
-		return lookPoint;
+		return new Vector3d(lookPoint);
 	}
 
 	@Override
 	public Vector3d getLookVector() {
-		return lookVector;
+		return new Vector3d(lookVector);
 	}
 
 	@Override
 	public Vector3d getUpVector() {
-		return upVector;
+		return new Vector3d(upVector);
 	}
 
 	@Override
@@ -261,32 +249,33 @@ public class Camera implements CameraInterface {
 		return distanceToViewplane;
 	}
 
+	@Override
 	public void setDistanceToViewplane(double distanceToViewplaneParam) {
 		distanceToViewplane = distanceToViewplaneParam;
 	}
 
 	@Override
 	public Vector3d getViewplaneTop() {
-		return viewplaneTop;
+		return new Vector3d(viewplaneTop);
 	}
 
 	@Override
-	public void setViewplaneTopLength(double viewplaneHeight) {
-		// viewplaneLeft = -upVector * viewplaneHeight
-		viewplaneLeft.scale(viewplaneHeight, upVector);
-		viewplaneLeft.negate();
-	}
-
-	@Override
-	public Vector3d getViewplaneLeft() {
-		return viewplaneLeft;
-	}
-
-	@Override
-	public void setViewplaneLeftLength(double viewplaneWidth) {
+	public void setViewplaneTopLength(double viewplaneWidth) {
 		// viewplaneTop = upVector X lookVector * viewplaneWidth
 		viewplaneTop.cross(upVector, lookVector);
 		viewplaneTop.negate();
 		viewplaneTop.scale(viewplaneWidth);
+	}
+
+	@Override
+	public Vector3d getViewplaneLeft() {
+		return new Vector3d(viewplaneLeft);
+	}
+
+	@Override
+	public void setViewplaneLeftLength(double viewplaneHeight) {
+		// viewplaneLeft = -upVector * viewplaneHeight
+		viewplaneLeft.scale(viewplaneHeight, upVector);
+		viewplaneLeft.negate();
 	}
 }

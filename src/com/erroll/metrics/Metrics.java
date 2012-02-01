@@ -5,37 +5,30 @@ import java.util.HashMap;
 public class Metrics {
 
 	// fields for tracking frames per second
-	public int fpsAccumulator;
-	public int fps;
-	public long start;
+	private long timeSince;
+	private int fpsAccumulator;
+	private int fps;
 
 	// this HashMap can be used for other data being tracked
-	private HashMap<String, Integer> data = new HashMap<String, Integer>();
+	private HashMap<String, Double> data = new HashMap<String, Double>();
 
 	/**
 	 * Construct the FpsCounter, initializing all fields
 	 */
 	public Metrics() {
-		initialise();
-	}
-
-	/**
-	 * Initialize all fields being recorded
-	 */
-	private void initialise() {
 		fpsAccumulator = 0;
 		fps = 0;
-		start = 0;
+		timeSince = 0;
 	}
 
 	/**
 	 * Called by the panel once it draws a frame. This increases the frames-per-second counter during the second for which it is counted
 	 */
 	public void registerFrameRender() {
-		if (System.currentTimeMillis() - start >= 1000) {
+		if (System.currentTimeMillis() - timeSince >= 1000) {
 			fps = fpsAccumulator;
 			fpsAccumulator = 0;
-			start = System.currentTimeMillis();
+			timeSince = System.currentTimeMillis();
 		} else {
 			fpsAccumulator++;
 		}
@@ -49,34 +42,27 @@ public class Metrics {
 	}
 
 	/**
-	 * @return The stored arbitrary data in the form of a HashMap
-	 */
-	public HashMap<String, Integer> getData() {
-		return data;
-	}
-
-	/**
 	 * @param id
 	 *            The identifier of the particular value being requested
 	 * @return the value of the arbitrary data being requested or Integer.MIN_VALUE if no data exists
 	 */
-	public Integer getData(String id) {
+	public Double getData(String id) {
 		if (data.containsKey(id))
 			return data.get(id);
 		else
-			return Integer.MIN_VALUE;
+			return Double.MIN_VALUE;
 	}
 
 	/**
-	 * Adds 1 to or creates a field in the data of value 1 for the key specified
+	 * Adds d to or creates a field in the data of value d for the key specified
 	 * 
 	 * @param id
 	 *            The identifier of the value
 	 */
-	public void incrementData(String id) {
+	public void incrementData(String id, double d) {
 		if (data.containsKey(id))
-			data.put(id, data.get(id) + 1);
+			data.put(id, data.get(id) + d);
 		else
-			data.put(id, 1);
+			data.put(id, d);
 	}
 }

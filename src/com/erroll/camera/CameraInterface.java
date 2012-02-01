@@ -50,7 +50,7 @@ public interface CameraInterface {
 	 *            The resolution of the output vertical down the screen
 	 * @return the position in 3D space of that pixel on the viewplane
 	 */
-	Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY);
+	//Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY);
 
 	/**
 	 * @param newPosition
@@ -127,11 +127,6 @@ public interface CameraInterface {
 	 *            The angle by which to rotate the camera
 	 */
 	void rotate(Vector3d axis, double angle);
-
-	/**
-	 * Prints formatted information about the Camera implementation to the console
-	 */
-	void printInfo();
 
 	/**
 	 * @return The position of the camera in space

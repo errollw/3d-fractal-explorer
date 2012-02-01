@@ -9,7 +9,7 @@ import com.erroll.camera.CameraInterface;
 
 public class KeyboardControlListener implements KeyListener {
 
-	private static final double ORIGIN_ROTATE = 0.2d;
+	private static final double ORIGIN_ROTATE = 0.1d;
 
 	// camera to be rotated
 	private CameraInterface c;
@@ -40,7 +40,7 @@ public class KeyboardControlListener implements KeyListener {
 			c.moveCameraBy(offset);
 		} else if (e.getKeyCode() == 65) {
 			Vector3d offset = new Vector3d(c.getViewplaneTop());
-			offset.scale(-0.02d);
+			offset.scale(-0.01d);
 			c.moveCameraBy(offset);
 		} else if (e.getKeyCode() == 83) {
 			Vector3d offset = new Vector3d(c.getLookVector());
@@ -48,7 +48,7 @@ public class KeyboardControlListener implements KeyListener {
 			c.moveCameraBy(offset);
 		} else if (e.getKeyCode() == 68) {
 			Vector3d offset = new Vector3d(c.getViewplaneTop());
-			offset.scale(0.02d);
+			offset.scale(0.01d);
 			c.moveCameraBy(offset);
 		}
 
@@ -61,6 +61,11 @@ public class KeyboardControlListener implements KeyListener {
 			c.rotate(c.getViewplaneTop(), -0.01d);
 		else if (e.getKeyCode() == 76)
 			c.rotate(c.getViewplaneLeft(), +0.01d);
+
+		if (e.getKeyCode() == 81)
+			c.setDistanceToViewplane(c.getDistanceToViewplane() + 1);
+		else if (e.getKeyCode() == 69)
+			c.setDistanceToViewplane(c.getDistanceToViewplane() - 1);
 
 	}
 

@@ -2,7 +2,7 @@ package com.erroll.renderer;
 
 import javax.vecmath.Vector3d;
 
-public class Ray implements RayInterface {
+public class Ray {
 	private Vector3d start;
 	private Vector3d dir;
 
@@ -24,33 +24,24 @@ public class Ray implements RayInterface {
 		dir.normalize();
 	}
 
-	@Override
-	public void printInfo() {
-		System.out.printf("start:\t(%.2f, %.2f, %.2f)" + "\t" + "dir:\t(%.2f, %.2f, %.2f)\n", start.x, start.y, start.z, dir.x, dir.y, dir.z);
-	}
-
 	// ----------------------------------------------------------------------------
 	// Getters & Setters
 	// ----------------------------------------------------------------------------
 
-	@Override
+	/**
+	 * @return The normalized direction vector of the Ray
+	 */
 	public Vector3d getDir() {
 		return dir;
 	}
 
-	@Override
-	public void setDir(Vector3d dir) {
-		this.dir = dir;
-		dir.normalize();
-	}
-
-	@Override
+	/**
+	 * Sets the start position in space of the Ray
+	 * 
+	 * @param start
+	 *            The new start position
+	 */
 	public Vector3d getStart() {
 		return start;
-	}
-
-	@Override
-	public void setStart(Vector3d start) {
-		this.start = start;
 	}
 }
