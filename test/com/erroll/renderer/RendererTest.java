@@ -61,9 +61,12 @@ public class RendererTest {
 					childrenNodes[x][y][z].setLeaf(true);
 					childrenNodes[x][y][z].setEmpty((z == 1));
 					childrenNodes[x][y][z].setColor(12345);
+					childrenNodes[x][y][z].setNeighbor(4, null);
 				}
 			}
 		}
+		// set (1,1,0) node to be empty
+		childrenNodes[1][1][0].setEmpty(true);
 
 		// set neighbors
 		for (int x = 0; x < 2; x++) {
@@ -73,7 +76,14 @@ public class RendererTest {
 		}
 
 		renderer.addRootNode(node);
-		assertFalse(renderer.rayCast(new Ray(new Vector3d(0, 0, 5), new Vector3d(0.1, 0.1, -1))) == 0);
+		// shoot rays through 4 corner nodes of parent
+		assertFalse(renderer.rayCast(new Ray(new Vector3d(0, 0, 5), new Vector3d(-0.1, -0.1, -1))) == 0);
+		assertFalse(renderer.rayCast(new Ray(new Vector3d(0, 0, 5), new Vector3d(0.1, -0.1, -1))) == 0);
+		assertFalse(renderer.rayCast(new Ray(new Vector3d(0, 0, 5), new Vector3d(-0.1, 0.1, -1))) == 0);
+		// set (1,1,0) node is empty however
+		assertTrue(renderer.rayCast(new Ray(new Vector3d(0, 0, 5), new Vector3d(0.1, 0.1, -1))) == 0);
+
+		// shooting ray away from node should return black
 		assertTrue(renderer.rayCast(new Ray(new Vector3d(0, 0, 5), new Vector3d(0, 1, 0))) == 0);
 	}
 }
