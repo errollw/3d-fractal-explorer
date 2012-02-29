@@ -55,7 +55,7 @@ public class Camera implements CameraInterface {
 		viewplaneTop = new Vector3d();
 		viewplaneLeft = new Vector3d();
 
-		initialise(new Vector3d(0.0d, 0.0d, 5.0d), new Vector3d(0.0d, 0.0d, 0.0d), 3d, 3d, 3d);
+		initialise(new Vector3d(0.0d, 0.0d, 5.0d), new Vector3d(0.0d, 0.0d, 0.0d), 3d, 1.5d, 1.5d);
 	}
 
 	@Override

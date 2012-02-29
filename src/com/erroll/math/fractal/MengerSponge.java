@@ -41,6 +41,6 @@ public class MengerSponge implements FractalInterface {
 
 			r = x * x + y * y + z * z;
 		}
-		return ((Math.sqrt(r) - 2) * Math.pow(scale, (-i)) < d);
+		return ((Math.sqrt(r)) * Math.pow(scale, (-i)) < d);
 	}
 }

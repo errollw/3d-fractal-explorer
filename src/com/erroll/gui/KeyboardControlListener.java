@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 import javax.vecmath.Vector3d;
 
 import com.erroll.camera.CameraInterface;
+import com.erroll.octree.scaleadaptation.BrickManager;
 
 public class KeyboardControlListener implements KeyListener {
 
@@ -15,7 +16,7 @@ public class KeyboardControlListener implements KeyListener {
 	private CameraInterface c;
 
 	// set up fields
-	public KeyboardControlListener(CameraInterface cameraParam) {
+	public KeyboardControlListener(CameraInterface cameraParam, BrickManager bm) {
 		c = cameraParam;
 	}
 
@@ -37,6 +38,7 @@ public class KeyboardControlListener implements KeyListener {
 		if (e.getKeyCode() == 87) {
 			Vector3d offset = new Vector3d(c.getLookVector());
 			offset.scale(0.1d);
+			// bm.unifyBricks();
 			c.moveCameraBy(offset);
 		} else if (e.getKeyCode() == 65) {
 			Vector3d offset = new Vector3d(c.getViewplaneTop());

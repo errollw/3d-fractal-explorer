@@ -36,7 +36,7 @@ public class OctreeNodePoolManager {
 	 * 
 	 * @return An OctreeNode to be used, null if there are no nodes left to be returned.
 	 */
-	public OctreeNode acquireNode() {
+	public synchronized OctreeNode acquireNode() {
 
 		// get position of OctreeNode to be borrowed out
 		int nodeToBeAllocated = nextFree;
