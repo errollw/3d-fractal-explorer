@@ -6,6 +6,12 @@ public class UnifyNodeThread implements Runnable {
 
 	private OctreeNode node;
 
+	/**
+	 * Create this thread to unify this node and delete all its children
+	 * 
+	 * @param node
+	 *            OctreeNode to be unified
+	 */
 	public UnifyNodeThread(OctreeNode node) {
 		this.node = node;
 	}

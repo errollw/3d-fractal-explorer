@@ -9,7 +9,7 @@ import com.erroll.renderer.effects.ColorUtils;
 public class SubdivideNodeThread implements Runnable {
 
 	// The interval in depths between different bricks
-	private final int BRICK_INTERVAL = 4;
+	private final int BRICK_INTERVAL = 2;
 
 	// The brick manager
 	BrickManager brickManager;
@@ -23,7 +23,7 @@ public class SubdivideNodeThread implements Runnable {
 	private double boxDim;
 
 	// square root of 3
-	private final double sqrt3 = Math.sqrt(3);
+	private final double sqrt3 = Math.sqrt(3d);
 
 	/**
 	 * Create a new thread to subdivide a single node in particular. Pass in all the objects it will need to compute the result.
@@ -39,7 +39,7 @@ public class SubdivideNodeThread implements Runnable {
 	@Override
 	public void run() {
 
-		// modifying this node cannot be done in conjunction with deleting the node or anything else
+		// modifying this node cannot be done in conjunction with deleting the node
 		synchronized (node) {
 
 			// if the node has already been deleted, do not subdivide
@@ -47,8 +47,8 @@ public class SubdivideNodeThread implements Runnable {
 				return;
 
 			// constants to be used in checking if the fractal exists at a point
-			final double bd2 = boxDim / 2;
-			final double bd4 = boxDim / 4;
+			final double bd2 = boxDim / 2d;
+			final double bd4 = boxDim / 4d;
 			final double offsetX = boxMin.x + bd4;
 			final double offsetY = boxMin.y + bd4;
 			final double offsetZ = boxMin.z + bd4;

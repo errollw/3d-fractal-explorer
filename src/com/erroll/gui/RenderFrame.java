@@ -5,13 +5,13 @@ import java.awt.Graphics;
 import java.util.Properties;
 
 import javax.swing.JFrame;
-import javax.vecmath.Vector3d;
 
 import com.erroll.camera.Camera;
-import com.erroll.math.Axis;
+import com.erroll.camera.paths.FlightPath;
+import com.erroll.camera.paths.mengersponge.MengerSpongeTourPath;
+import com.erroll.camera.paths.mengersponge.MengerSpongeZoomPath;
 import com.erroll.metrics.Metrics;
 import com.erroll.octree.OctreeNode;
-import com.erroll.octree.OctreeNodePoolManager;
 import com.erroll.octree.scaleadaptation.BrickManager;
 import com.erroll.octree.scaleadaptation.Subdivider;
 import com.erroll.properties.Parameters;
@@ -29,21 +29,21 @@ public class RenderFrame extends JFrame {
 	// Camera to shoot rays from
 	private static Camera camera;
 
-	// OctreeNodePool to manage memory usage
-	private static OctreeNodePoolManager onpm;
-
 	// Subdivider object to subdivide nodes
-	// private static SubdividerThreadless subdivider;
 	private static Subdivider subdivider;
 
+	// BrickManager to tidy up unused OctreeNodes
 	private static BrickManager bm;
+
+	// Properties file containing parameters
+	private static Properties props;
 
 	// Metrics object to record rendering data
 	private static Metrics metrics;
 
 	public RenderFrame() {
 		// load properties
-		Properties props = Parameters.get();
+		props = Parameters.get();
 
 		// set basic JFrame properties
 		int screenSize = Integer.parseInt(props.getProperty("SCREEN_SIZE"));
@@ -59,9 +59,6 @@ public class RenderFrame extends JFrame {
 
 		// create Metrics object to record rendering data
 		metrics = new Metrics();
-
-		// create pool of octree nodes to be used
-		onpm = new OctreeNodePoolManager(5000000);
 
 		// create a default camera
 		camera = new Camera();
@@ -86,7 +83,7 @@ public class RenderFrame extends JFrame {
 		renderer.setRecording(props.getProperty("RECORDING").equals("true"));
 
 		// add a root node to the renderer for starting rendering
-		OctreeNode rootNode = onpm.acquireNode();
+		OctreeNode rootNode = new OctreeNode();
 		rootNode.setDepth(0);
 		rootNode.setBrick(rootNode);
 		rootNode.setLeaf(true);
@@ -99,14 +96,18 @@ public class RenderFrame extends JFrame {
 
 		// frame to be rendered into
 		final RenderFrame renderFrame = new RenderFrame();
-		renderFrame.addKeyListener(new KeyboardControlListener(camera, bm));
 
-		// camera.moveCameraBy(new Vector3d(-0.9d, -0.9d, 0));
-		camera.moveCameraBy(new Vector3d(0d, 0d, 10d));
-		camera.rotateAroundOrigin(Axis.Y, -0.5);
-		camera.rotateAroundOrigin(Axis.X, -0.5);
-		camera.rotateAroundOrigin(Axis.X, 1.4);
-		// camera.setDistanceToViewplane(camera.getDistanceToViewplane() * 6);
+		// set the flight path (if there is one)
+		FlightPath path = null;
+		String fractalType = props.getProperty("FRACTAL_TYPE");
+		String pathType = props.getProperty("PATH_TYPE");
+
+		// flight path depends on fractal type
+		if (fractalType.equals("MengerSponge"))
+			path = pathType.equals("Tour") ? new MengerSpongeTourPath(camera) : pathType.equals("Zoom") ? new MengerSpongeZoomPath(camera) : null;
+
+		// keyListener to control the camera and flight path (ENTER to start)
+		renderFrame.addKeyListener(new KeyboardControlListener(camera, path));
 
 		// loop to draw graphics to screen using BufferStrategy with 2 buffers
 		while (true) {
@@ -120,13 +121,9 @@ public class RenderFrame extends JFrame {
 			}
 			renderFrame.getBufferStrategy().show();
 
-			// rotate camera
-			// camera.rotateAroundOrigin(Axis.Y, 0.05);
-			// camera.setDistanceToViewplane(camera.getDistanceToViewplane() * 1.01);
-
-			Vector3d offset = new Vector3d(camera.getLookVector());
-			offset.scale(renderer.getOptTmin() * 0.01);
-			camera.moveCameraBy(offset);
+			// update the camera position using the flight path if one has been loaded
+			if (path != null)
+				path.updatePosition(camera, renderer, metrics);
 
 			renderFrame.setTitle("FPS: " + metrics.getFps());
 		}

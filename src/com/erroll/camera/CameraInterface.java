@@ -50,7 +50,7 @@ public interface CameraInterface {
 	 *            The resolution of the output vertical down the screen
 	 * @return the position in 3D space of that pixel on the viewplane
 	 */
-	//Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY);
+	Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY);
 
 	/**
 	 * @param newPosition
@@ -144,6 +144,13 @@ public interface CameraInterface {
 	Vector3d getLookVector();
 
 	/**
+	 * Sets the lookVector for the camera and adjusts viewplane and upvector accordingly
+	 * 
+	 * @param lookVector
+	 */
+	void setLookVector(Vector3d lookVector);
+
+	/**
 	 * @return A normalized vector in the up direction for the camera
 	 */
 	Vector3d getUpVector();
@@ -152,7 +159,7 @@ public interface CameraInterface {
 	 * @return The distance from the camera's position to its viewplane
 	 */
 	double getDistanceToViewplane();
-	
+
 	/**
 	 * This modifies how far the camera is from the viewplane; changes the field-of-view
 	 */
@@ -177,4 +184,9 @@ public interface CameraInterface {
 	 * sets the length of the left side of the viewplane
 	 */
 	void setViewplaneLeftLength(double viewplaneWidth);
+
+	/**
+	 * prints information about the camera to the console
+	 */
+	void printInfo();
 }

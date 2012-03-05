@@ -21,6 +21,8 @@ public class Camera implements CameraInterface {
 	private double distanceToViewplane;
 
 	// from camera's point of view, the viewplane is defined by these vectors
+	private double viewplaneWidth;
+	private double viewplaneHeight;
 	private Vector3d viewplaneTop;
 	private Vector3d viewplaneLeft;
 
@@ -72,6 +74,10 @@ public class Camera implements CameraInterface {
 
 		// sets the distanceToViewplane to be used later
 		distanceToViewplane = distanceToViewplaneParam;
+
+		// initialize viewplane height and width
+		this.viewplaneWidth = viewplaneWidth;
+		this.viewplaneHeight = viewplaneHeight;
 
 		// viewplaneLeft = -upVector * viewplaneHeight
 		viewplaneLeft.scale(viewplaneHeight, upVector);
@@ -195,7 +201,20 @@ public class Camera implements CameraInterface {
 		return vectorToPixel;
 	}
 
-	private Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY) {
+	@Override
+	public void printInfo() {
+		// prints position, lookPoint, lookVector, upVector, viewplaneTop, viewplaneLeft
+		System.out.printf("position:\t(%.2f, %.2f, %.2f)" + "\t" + "lookPoint:\t(%.2f, %.2f, %.2f)\n", position.x, position.y, position.z, lookPoint.x,
+				lookPoint.y, lookPoint.z);
+		System.out.printf("lookVector:\t(%.2f, %.2f, %.2f)" + "\t" + "upVector:\t(%.2f, %.2f, %.2f)\n", lookVector.x, lookVector.y, lookVector.z, upVector.x,
+				upVector.y, upVector.z);
+		System.out.printf("viewplaneTop:\t(%.2f, %.2f, %.2f)" + "\t" + "viewplaneLeft:\t(%.2f, %.2f, %.2f)\n", viewplaneTop.x, viewplaneTop.y, viewplaneTop.z,
+				viewplaneLeft.x, viewplaneLeft.y, viewplaneLeft.z);
+		System.out.println();
+	}
+
+	@Override
+	public Vector3d getPositionOfPixel(double x, double y, double resolutionX, double resolutionY) {
 
 		// set the return value to the top left of the viewplane on origin
 		Vector3d pixelPosition = new Vector3d();
@@ -237,6 +256,30 @@ public class Camera implements CameraInterface {
 	@Override
 	public Vector3d getLookVector() {
 		return new Vector3d(lookVector);
+	}
+
+	@Override
+	public void setLookVector(Vector3d lookVector) {
+		// generates lookVector, keep old upVector
+		this.lookVector = lookVector;
+		lookVector.normalize();
+
+		// ensure viewplaneTop and upVector will be correctly aligned
+		viewplaneTop.cross(new Vector3d(0d, 1d, 0d), lookVector);
+		viewplaneLeft.negate();
+
+		// upVector = viewplaneTop X lookVector
+		upVector.cross(viewplaneTop, lookVector);
+		upVector.normalize();
+
+		// viewplaneLeft = -upVector * viewplaneHeight
+		viewplaneLeft.scale(viewplaneHeight, upVector);
+		viewplaneLeft.negate();
+
+		// viewplaneTop = upVector X lookVector * viewplaneWidth
+		viewplaneTop.cross(upVector, lookVector);
+		viewplaneLeft.negate();
+		viewplaneTop.scale(viewplaneWidth);
 	}
 
 	@Override

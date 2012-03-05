@@ -13,7 +13,6 @@ public class SSAOTest extends SSAO {
 		int screenWidth = 8;
 		double[] imageDepth = new double[screenWidth * screenHeight];
 		int[] occlusion = new int[screenWidth * screenHeight];
-		double optTmin = 0d;
 
 		// initialse all depths to maximum
 		for (int row = 0; row < screenHeight; row++)
@@ -28,7 +27,7 @@ public class SSAOTest extends SSAO {
 		imageDepth[4 * screenWidth + 5] = 1;
 
 		// set the occlusion
-		SSAO.setOcclusion(imageDepth, screenHeight, screenWidth, occlusion, optTmin);
+		SSAO.setOcclusion(imageDepth, screenHeight, screenWidth, occlusion);
 
 		// asset correct shadows have been generated
 		assertTrue(occlusion[4 * screenWidth + 4] != 0);

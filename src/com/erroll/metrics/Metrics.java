@@ -4,10 +4,14 @@ import java.util.HashMap;
 
 public class Metrics {
 
+	// time this Metrics recorder was instantiated
+	private long startTime;
+
 	// fields for tracking frames per second
 	private long timeSince;
 	private int fpsAccumulator;
 	private int fps;
+	private int totalFrames;
 
 	// this HashMap can be used for other data being tracked
 	private HashMap<String, Double> data = new HashMap<String, Double>();
@@ -16,6 +20,8 @@ public class Metrics {
 	 * Construct the FpsCounter, initializing all fields
 	 */
 	public Metrics() {
+		startTime = System.currentTimeMillis();
+		totalFrames = 0;
 		fpsAccumulator = 0;
 		fps = 0;
 		timeSince = 0;
@@ -25,6 +31,7 @@ public class Metrics {
 	 * Called by the panel once it draws a frame. This increases the frames-per-second counter during the second for which it is counted
 	 */
 	public void registerFrameRender() {
+		totalFrames++;
 		if (System.currentTimeMillis() - timeSince >= 1000) {
 			fps = fpsAccumulator;
 			fpsAccumulator = 0;
@@ -64,5 +71,12 @@ public class Metrics {
 			data.put(id, data.get(id) + d);
 		else
 			data.put(id, d);
+	}
+
+	/**
+	 * @return The total frames rendered / time taken so far
+	 */
+	public double getAvgFps() {
+		return (totalFrames / ((System.currentTimeMillis() - startTime) / 1000d));
 	}
 }

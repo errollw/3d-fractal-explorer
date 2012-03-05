@@ -32,10 +32,10 @@ public class SSAO {
 	 * @param minAvgMaxDepths
 	 *            The minimum, average and maximum depths in the image
 	 */
-	public static final void setOcclusion(double[] imageDepth, int screenHeight, int screenWidth, int[] occlusion, double optTmin) {
+	public static final double setOcclusion(double[] imageDepth, int screenHeight, int screenWidth, int[] occlusion) {
 
 		// set initial minimum, average, and maximum depths
-		optTmin = Double.MAX_VALUE;
+		double minTmin = Double.MAX_VALUE;
 
 		// loop through every pixel in the screen (except edge ones without enough kernel space)
 		for (int row = KERNEL; row < screenHeight - KERNEL; row++) {
@@ -57,7 +57,7 @@ public class SSAO {
 						sumOfDifferences += d * ((Math.abs(d) > CUT_OFF_DIST) ? 0 : MULTIPLE);
 					}
 				}
-				optTmin = optTmin < imageDepth[index] ? optTmin : imageDepth[index];
+				minTmin = minTmin < imageDepth[index] ? minTmin : imageDepth[index];
 
 				// cut off the amount of shadow to be between 0 and CUT_OFF_SHADOW
 				if (sumOfDifferences < 0)
@@ -69,6 +69,6 @@ public class SSAO {
 				occlusion[index] = (int) (sumOfDifferences);
 			}
 		}
+		return minTmin;
 	}
-
 }

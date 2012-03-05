@@ -35,7 +35,7 @@ public class Subdivider implements Runnable {
 	public Subdivider() {
 		// load properties and determine fractal type
 		Properties props = Parameters.get();
-		String fractalName = props.getProperty("FRACTALTYPE");
+		String fractalName = props.getProperty("FRACTAL_TYPE");
 		if (fractalName.equals("Mandelbox"))
 			f = new Mandelbox();
 		else if (fractalName.equals("Mandelbulb"))
