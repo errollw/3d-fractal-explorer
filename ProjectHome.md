@@ -1,0 +1,1 @@
+This project aims to develop a system to allow users to explore 3D fractals and their infinitely complex detail. They will be able to describe a fractal by choosing a fractal archetype from a library and specifying relevant parameters involved in its construction. The system will then generate geometric data on the fly as the user navigates around and into it in real time.
